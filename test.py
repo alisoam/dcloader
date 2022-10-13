@@ -5,18 +5,20 @@ from dataclass_config import load
 
 
 @dataclass
-class Y:
+class B:
     a: str
     b: int
+    c: int
+    d: int = 24
 
 
 @dataclass
-class X:
-    y: Y
-    c: str
-    a: int = 11
-    b: int = 12
+class Root:
+    a: str
+    b: B
+    c: int
+    d: int = 4
 
 
 if __name__ == "__main__":
-    print(load(X, path="cfg.yaml", prefix="SVC"))
+    print(load(Root, path="config.yaml", prefix="CONFIG"))
