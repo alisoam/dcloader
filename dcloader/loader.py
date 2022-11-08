@@ -9,7 +9,7 @@ T = TypeVar('T')
 
 class Source(abc.ABC):
     @abc.abstractmethod
-    def get(self, path: Path, value_type: type[T]) -> T:
+    def get(self, path: Path, value_type: type[T]) -> T | None:
         ...
 
     @abc.abstractmethod
