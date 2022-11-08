@@ -4,7 +4,7 @@ setup(
     name="dcloader",
     packages=["dcloader"],
     package_dir={"dcloader": "dcloader"},
-    version="0.1.3",
+    version="0.2.0",
     description="",
     author="Ali Sorour Amini",
     author_email="ali.sorouramini@gmail.com",

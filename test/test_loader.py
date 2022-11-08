@@ -52,13 +52,13 @@ class TestDataclass(unittest.TestCase):
 
         @dataclass
         class Root:
-            node: Leaf = field(default_factory=lambda: Leaf(node="value"))
+            leaf: Leaf = field(default_factory=lambda: Leaf(node="value"))
 
         loader = Loader([])
 
         obj = loader.load(Root)
 
-        self.assertEqual(obj.node.node, "value")
+        self.assertEqual(obj.leaf.node, "value")
 
     def test_union(self):
         @dataclass

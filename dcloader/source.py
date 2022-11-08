@@ -4,7 +4,7 @@ from typing import TypeVar
 
 import yaml
 
-from .loader import Path, Source
+from .loader import Path, Source, ValueContainer
 from .utils import str_to_timedelta
 
 T = TypeVar("T")
@@ -14,7 +14,7 @@ class DictSource(Source):
     def __init__(self, values: dict):
         self.values = values
 
-    def get(self, path: Path, value_type: type[T]) -> T | None:
+    def get(self, path: Path, value_type: type[T]) -> ValueContainer[T] | None:
         value = self.values
         for key in path:
             value = value.get(key)
@@ -22,16 +22,7 @@ class DictSource(Source):
                 return None
 
         assert isinstance(value, value_type)
-        return value
-
-    def exists(self, path: Path) -> bool:
-        value = self.values
-        for key in path:
-            value = value.get(key)
-            if value is None:
-                return False
-
-        return True
+        return ValueContainer(value)
 
 
 class YAMLSource(Source):
@@ -39,7 +30,7 @@ class YAMLSource(Source):
         with open(path, 'r') as file:
             self.values = yaml.safe_load(file)
 
-    def get(self, path: Path, value_type: type[T]) -> T | None:
+    def get(self, path: Path, value_type: type[T]) -> ValueContainer[T] | None:
         value = self.values
         for key in path:
             value = value.get(key)
@@ -48,40 +39,26 @@ class YAMLSource(Source):
 
         if value_type == timedelta:
             assert type(value) is str
-            return str_to_timedelta(value)
+            return ValueContainer(str_to_timedelta(value))
 
         assert isinstance(value, value_type)
-        return value
-
-    def exists(self, path: Path) -> bool:
-        if self.values is None:
-            return False
-
-        value = self.values
-        for key in path:
-            value = value.get(key)
-            if value is None:
-                return False
-
-        return True
+        return ValueContainer(value)
 
 
 class EnvSource(Source):
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def get(self, path: Path, value_type: type[T]) -> T | None:
-        value = os.environ.get(self.name(path))
+    def get(self, path: Path, value_type: type[T]) -> ValueContainer[T] | None:
+        name = self.name(path)
+        value = os.environ.get(name)
         if value is None:
             return None
 
         if value_type == timedelta:
-            return str_to_timedelta(value)
+            return ValueContainer(str_to_timedelta(value))
 
-        return value_type(value)
-
-    def exists(self, path: Path) -> bool:
-        return os.environ.get(self.name(path)) is not None
+        return ValueContainer(value_type(value))
 
     def name(self, path: Path) -> str:
         name = self.prefix + "_"

@@ -28,17 +28,12 @@ class TestYaml(unittest.TestCase):
             self.assertEqual(obj.node, timedelta(seconds=10))
 
 
-class TestEvn(unittest.TestCase):
+class TestEnv(unittest.TestCase):
     def setUp(self):
-        self._env = os.environ.get("DCLOADER_TEST_NODE")
         os.environ["DCLOADER_TEST_NODE"] = "10s"
-
-    def tearDown(self):
-        if self._env:
-            os.environ["DCLOADER_TEST_NODE"] = self._env
+        os.environ["DCLOADER_TEST_LEAF__NODE"] = "100"
 
     def test_timedelta(self):
-
         @dataclass
         class Root:
             node: timedelta
@@ -48,3 +43,19 @@ class TestEvn(unittest.TestCase):
         obj = loader.load(Root)
 
         self.assertEqual(obj.node, timedelta(seconds=10))
+
+    def test_nested(self):
+
+        @dataclass
+        class Leaf:
+            node: int
+
+        @dataclass
+        class Root:
+            leaf: Leaf
+
+        loader = Loader([EnvSource("DCLOADER_TEST")])
+
+        obj = loader.load(Root)
+
+        self.assertEqual(obj.leaf.node, 100)
