@@ -1,45 +1,38 @@
-# Dataclass Loader
+# DCLoader
 
-Load a data class from a ymal file and environment.
+Load a data class from diffrent sources.
+Including: Environment Variables, YAML files, and, ....
 
-test.py
-``` py
+main.py
+``` python
 from dataclasses import dataclass
 
-
-from dataclass_config import load
+from dcloader import EnvLoader, Loader, YAMLLoader
 
 
 @dataclass
-class B:
-    a: str
-    b: int
-    c: int
-    d: int = 24
+class Leaf:
+    node: str
 
 
 @dataclass
 class Root:
-    a: str
-    b: B
-    c: int
-    d: int = 4
+    leaf: Leaf
+    node: int
 
 
-cfg = load(Root, path="config.yaml", prefix="CONFIG")
+loader = Loader([EnvLoader(prefix="CONFIG"), YAMLLoader("config.yaml")])
+cfg = loader.load(Root)
 print(cfg)
 ```
 
-config.cfg
+config.yaml
 ``` yaml
-b:
-  c: 23
-c: 13
+leaf:
+  node: value
 ```
 
 ``` sh
-$ export CONFIG_A=a
-$ export CONFIG_B_A=b_a
-$ export CONFIG_B_B=22
-$ python test.py
+$ export CONFIG_NODE=12
+$ python main.py
 ```
