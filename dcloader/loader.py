@@ -1,5 +1,5 @@
 import abc
-from dataclasses import dataclass, fields, is_dataclass, MISSING, Field
+from dataclasses import MISSING, Field, dataclass, fields, is_dataclass
 from typing import Any, TypeAlias, TypeVar
 
 Path: TypeAlias = list[str]
