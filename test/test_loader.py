@@ -10,13 +10,15 @@ class Test(unittest.TestCase):
         class Root:
             node1: str
             node2: int
+            node3: float
 
-        loader = Loader([DictSource({"node1": "value", "node2": 1})])
+        loader = Loader([DictSource({"node1": "value", "node2": 1, "node3": 1.5})])
 
         obj = loader.load(Root)
 
         self.assertEqual(obj.node1, "value")
         self.assertEqual(obj.node2, 1)
+        self.assertEqual(obj.node3, 1.5)
 
 
 class TestDataclass(unittest.TestCase):

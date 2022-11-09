@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from typing import TypeVar
+from typing import Any, TypeVar
 
 import yaml
 
@@ -15,7 +15,7 @@ class DictSource(Source):
         self.values = values
 
     def get(self, path: Path, value_type: type[T]) -> ValueContainer[T] | None:
-        value = self.values
+        value: Any = self.values
         for key in path:
             value = value.get(key)
             if value is None:
@@ -39,7 +39,7 @@ class YAMLSource(Source):
 
         if value_type == timedelta:
             assert type(value) is str
-            return ValueContainer(str_to_timedelta(value))
+            return ValueContainer(str_to_timedelta(value))  # type: ignore
 
         assert isinstance(value, value_type)
         return ValueContainer(value)
@@ -56,9 +56,9 @@ class EnvSource(Source):
             return None
 
         if value_type == timedelta:
-            return ValueContainer(str_to_timedelta(value))
+            return ValueContainer(str_to_timedelta(value))  # type: ignore
 
-        return ValueContainer(value_type(value))
+        return ValueContainer(value_type(value))  # type: ignore
 
     def name(self, path: Path) -> str:
         name = self.prefix + "_"
