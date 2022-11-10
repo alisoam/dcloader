@@ -5,7 +5,7 @@ setup(
     packages=["dcloader"],
     package_dir={"dcloader": "dcloader"},
     package_data={"dcloader": ["py.typed"]},
-    version="0.2.1",
+    version="0.3.0",
     description="",
     author="Ali Sorour Amini",
     author_email="ali.sorouramini@gmail.com",
