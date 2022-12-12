@@ -45,6 +45,9 @@ class Loader:
                     params[field.name] = v.value
                     has_non_default = True
 
+            if field.name in params:
+                continue
+
             if field.default is not MISSING:
                 params[field.name] = field.default
 

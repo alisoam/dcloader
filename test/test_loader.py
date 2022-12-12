@@ -37,15 +37,19 @@ class TestDataclass(unittest.TestCase):
     def test_default(self):
         @dataclass
         class Root:
-            node1: str = "default"
-            node2: str = field(default="default")
+            node1: str = "default-1"
+            node2: str = field(default="default-2")
+            node3: str = "default-3"
+            node4: str = field(default="default-4")
 
-        loader = Loader([])
+        loader = Loader([DictSource({"node3": "non-default-1", "node4": "non-default-2"})])
 
         obj = loader.load(Root)
 
-        self.assertEqual(obj.node1, "default")
-        self.assertEqual(obj.node2, "default")
+        self.assertEqual(obj.node1, "default-1")
+        self.assertEqual(obj.node2, "default-2")
+        self.assertEqual(obj.node3, "non-default-1")
+        self.assertEqual(obj.node4, "non-default-2")
 
     def test_default_factory(self):
         @dataclass
