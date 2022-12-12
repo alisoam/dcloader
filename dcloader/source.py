@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from typing import Any, TypeVar
+from typing import Any, TypeVar, get_args, get_origin
 
 import yaml
 
@@ -54,6 +54,9 @@ class EnvSource(Source):
         value = os.environ.get(name)
         if value is None:
             return None
+
+        if get_origin(value_type) is list:
+            return ValueContainer([get_args(value_type)[0](x) for x in value.split(",")])  # type: ignore
 
         if value_type == timedelta:
             return ValueContainer(str_to_timedelta(value))  # type: ignore

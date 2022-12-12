@@ -32,6 +32,7 @@ class TestEnv(unittest.TestCase):
     def setUp(self):
         os.environ["DCLOADER_TEST_NODE"] = "10s"
         os.environ["DCLOADER_TEST_LEAF__NODE"] = "100"
+        os.environ["DCLOADER_TEST_LST"] = "1,2,3"
 
     def test_timedelta(self):
         @dataclass
@@ -45,7 +46,6 @@ class TestEnv(unittest.TestCase):
         self.assertEqual(obj.node, timedelta(seconds=10))
 
     def test_nested(self):
-
         @dataclass
         class Leaf:
             node: int
@@ -59,3 +59,14 @@ class TestEnv(unittest.TestCase):
         obj = loader.load(Root)
 
         self.assertEqual(obj.leaf.node, 100)
+
+    def test_list(self):
+        @dataclass
+        class Root:
+            lst: list[int]
+
+        loader = Loader([EnvSource("DCLOADER_TEST")])
+
+        obj = loader.load(Root)
+
+        self.assertEqual(obj.lst, [1, 2, 3])
