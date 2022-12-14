@@ -21,7 +21,6 @@ class DictSource(Source):
             if value is None:
                 return None
 
-        assert isinstance(value, value_type)
         return ValueContainer(value)
 
 
@@ -38,10 +37,8 @@ class YAMLSource(Source):
                 return None
 
         if value_type == timedelta:
-            assert type(value) is str
             return ValueContainer(str_to_timedelta(value))  # type: ignore
 
-        assert isinstance(value, value_type)
         return ValueContainer(value)
 
 
