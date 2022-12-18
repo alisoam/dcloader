@@ -1,7 +1,8 @@
 import unittest
 from dataclasses import dataclass, field
 
-from dcloader import DictSource, Loader
+from dcloader import Loader
+from dcloader.source import DictSource
 
 
 class Test(unittest.TestCase):
@@ -68,14 +69,18 @@ class TestDataclass(unittest.TestCase):
 
     def test_union(self):
         @dataclass
+        class Leaf:
+            node: str = "default"
+
+        @dataclass
         class Root:
-            node1: str | int
+            node1: str | Leaf
 
         loader1 = Loader([DictSource({"node1": "value"})])
-        loader2 = Loader([DictSource({"node1": 1})])
+        loader2 = Loader([DictSource({"node1": Leaf("value")})])
 
         obj1 = loader1.load(Root)
         obj2 = loader2.load(Root)
 
         self.assertEqual(obj1.node1, "value")
-        self.assertEqual(obj2.node1, 1)
+        self.assertEqual(obj2.node1, Leaf("value"))

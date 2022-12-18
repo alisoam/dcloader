@@ -2,10 +2,9 @@ from distutils.core import setup
 
 setup(
     name="dcloader",
-    packages=["dcloader"],
-    package_dir={"dcloader": "dcloader"},
+    packages=["dcloader", "dcloader.source"],
     package_data={"dcloader": ["py.typed"]},
-    version="0.6.0",
+    version="0.9.0",
     description="",
     author="Ali Sorour Amini",
     author_email="ali.sorouramini@gmail.com",

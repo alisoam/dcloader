@@ -1,20 +1,16 @@
 import abc
-from dataclasses import MISSING, dataclass, fields, is_dataclass
-from typing import Any, Generic, TypeAlias, TypeVar
+import types
+from dataclasses import MISSING, fields, is_dataclass
+from typing import Any, TypeAlias, TypeVar, get_args, get_origin
 
 Path: TypeAlias = list[str]
 
 T = TypeVar('T')
 
 
-@dataclass
-class ValueContainer(Generic[T]):
-    value: T
-
-
 class Source(abc.ABC):
     @abc.abstractmethod
-    def get(self, path: Path, value_type: type[T]) -> ValueContainer[T] | None:
+    def get(self, path: Path, value_type: type[T]) -> T:
         ...
 
 
@@ -22,28 +18,28 @@ class Loader:
     def __init__(self, sources: list[Source]):
         self.sources = sources
 
-    def _load(self, cls: type[T], path: Path = []) -> T | None:
+    def _load(self, cls: type[T], path: Path = []) -> T:
+        if is_dataclass(cls):
+            return self.load_dataclass(cls, path)
+
+        return self.load_others(cls, path)
+
+
+    def load_dataclass(self, cls: type[T], path: Path) -> T:
         params: dict[str, Any] = {}
         has_non_default = False
+
         for field in fields(cls):
             if not field.init:
                 continue
 
             field_path = path + [field.name]
 
-            if is_dataclass(field.type):
-                v = self._load(field.type, path=field_path)
-                if v is not None:
-                    params[field.name] = v
-                    has_non_default = True
-            else:
-                for source in self.sources:
-                    v = source.get(path=field_path, value_type=field.type)
-                    if v is None:
-                        continue
-
-                    params[field.name] = v.value
-                    has_non_default = True
+            try:
+                params[field.name] = self._load(field.type, path=field_path)
+                has_non_default = True
+            except ValueError:
+                pass
 
             if field.name in params:
                 continue
@@ -55,11 +51,30 @@ class Loader:
                 params[field.name] = field.default_factory()
 
         if not has_non_default and path:
-            return None
+            raise ValueError()
 
         return cls(**params)
 
+    def load_union(self, types: tuple[type, ...], path: Path) -> Any:
+        for field_type in types:
+            try:
+                return self._load(field_type, path=path)
+            except ValueError:
+                pass
+
+        raise ValueError()
+
+    def load_others(self, cls: type[T], path: Path) -> T:
+        if get_origin(cls) is types.UnionType:
+            return self.load_union(get_args(cls), path)
+
+        for source in self.sources:
+            try:
+                return source.get(path=path, value_type=cls)
+            except ValueError:
+                pass
+
+        raise ValueError()
+
     def load(self, cls: type[T]) -> T:
-        value = self._load(cls)
-        assert value is not None
-        return value
+        return self._load(cls)
