@@ -1,9 +1,9 @@
 import abc
 import types
 from dataclasses import MISSING, fields, is_dataclass
-from typing import Any, TypeAlias, TypeVar, get_args, get_origin
+from typing import Any, TypeVar, get_args, get_origin
 
-Path: TypeAlias = list[str]
+Path = list[str]
 
 T = TypeVar('T')
 
