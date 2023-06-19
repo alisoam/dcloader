@@ -65,7 +65,7 @@ class Loader:
         raise ValueError()
 
     def load_others(self, cls: type[T], path: Path) -> T:
-        if get_origin(cls) is types.UnionType:
+        if get_origin(cls) is typing.Union:
             return self.load_union(get_args(cls), path)
 
         for source in self.sources:
