@@ -1,7 +1,16 @@
 import builtins
-import types
 from datetime import timedelta
 from typing import Any, get_origin, get_args
+
+
+def bool_from_str(value: str) -> bool:
+    if value.lower() == "false":
+        return False
+
+    if value.lower() == "true":
+        return True
+
+    raise ValueError("not supported")
 
 
 def timedelta_from_str(duration: str) -> timedelta:
@@ -21,8 +30,11 @@ def timedelta_from_str(duration: str) -> timedelta:
 
 
 def from_str(value: str, t) -> Any:
-    if t in (str, int, float, bool):
+    if t in (str, int, float):
         return t(value)
+
+    if t == bool:
+        return bool_from_str(value)
 
     if t is timedelta:
         return timedelta_from_str(value)

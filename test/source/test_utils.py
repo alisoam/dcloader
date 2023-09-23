@@ -9,6 +9,7 @@ class TestFromStr(unittest.TestCase):
         self.assertEqual(from_str("1234", int), 1234)
         self.assertEqual(from_str("1.234", float), 1.234)
         self.assertEqual(from_str("1234", str), "1234")
+        self.assertEqual(from_str("false", bool),  False)
 
     def test_list(self):
         self.assertEqual(from_str("1234", list[int]), [1234])
